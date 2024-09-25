@@ -1,4 +1,4 @@
-import PySimpleGUI as sg
+from PySimpleGUI import Window, Text, Button, InputText, WIN_CLOSED
 from Inc_Diff import calc_diff, calc_inc
 
 
@@ -6,12 +6,13 @@ class GUI:
 
     def __init__(self):
         # Tudo que estiver dentro da janela
-        self.layout = [[sg.Text("Inisira a função:", size=15)],
-                    [sg.InputText()],
-                    [sg.Button('Calcular Incremento', size=(18,10)), sg.Button('Calcular Diferencial', size=(18,10))]]
+        self.layout = [[Text("Inisira a função:", size=15)],
+                    [InputText()],
+                    [Button('Calcular Incremento', size=(18,10)),
+                     Button('Calcular Diferencial', size=(18,10))]]
 
         # Cria a janela
-        self.window = sg.Window('Incrementos e Diferenciais', self.layout, size=(350,120), resizable=False)
+        self.window = Window('Incrementos e Diferenciais', self.layout, size=(350,120), resizable=False)
 
         self.catch_events(self.window)
 
@@ -20,7 +21,7 @@ class GUI:
             event, values = window.read()
 
             # if user closes window or clicks cancel
-            if event == sg.WIN_CLOSED:
+            if event == WIN_CLOSED:
                 break
 
             if event == 'Calcular Incremento':

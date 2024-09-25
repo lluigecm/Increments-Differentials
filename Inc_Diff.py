@@ -1,16 +1,15 @@
-import sympy as sp
-import PySimpleGUI as sg
-import matplotlib.pyplot as plt
-import re
-from PySimpleGUI import popup_error
+from PySimpleGUI import popup_error, Text, Button, WINDOW_CLOSED, Input, Window, Canvas
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from re import findall, sub
+from matplotlib.pyplot import subplots
+from sympy import symbols, diff, latex, simplify
 
 
 def calc_diff(f : str = None):
     if f is None or len(f) == 0:
         popup_error('Função Inválida', 'Insira um valor válido para a função!', auto_close=True, auto_close_duration=5)
         return
-    vars = re.findall(r'[xyz]', f)
+    vars = findall(r'[xyz]', f)
     vars = list(set(vars))
 
     if len(vars) == 2:
@@ -20,37 +19,37 @@ def calc_diff(f : str = None):
         calc_diff_3(f)
 
 def calc_diff_2(f : str):
-    function = re.sub(r'\^', '**', f)
+    function = sub(r'\^', '**', f)
 
-    x, y, dx, dy = sp.symbols('x y dx dy')
+    x, y, dx, dy = symbols('x y dx dy')
 
-    df_dx = sp.diff(function, x)
-    df_dy = sp.diff(function, y)
+    df_dx = diff(function, x)
+    df_dy = diff(function, y)
 
     df = dx*df_dx + dy*df_dy
 
     equacao_latex =(
         f'Diferencial da função $f(x,y)$ = ${f}$'
-        f'\n\n$D_f$ = ${sp.latex(df)}$'
+        f'\n\n$D_f$ = ${latex(df)}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial')
 
 def calc_diff_3(f : str):
-    function = re.sub(r'\^', '**', f)
+    function = sub(r'\^', '**', f)
 
-    x, y, z = sp.symbols('x y z')
-    dx, dy, dz = sp.symbols('dx dy dz')
+    x, y, z = symbols('x y z')
+    dx, dy, dz = symbols('dx dy dz')
 
-    df_dx = sp.diff(function, x)
-    df_dy = sp.diff(function, y)
-    df_dz = sp.diff(function, z)
+    df_dx = diff(function, x)
+    df_dy = diff(function, y)
+    df_dz = diff(function, z)
 
     df = df_dx*dx + df_dy*dy + df_dz*dz
 
     equacao_latex = (
         f'Diferencial da função f(x,y,z) = ${f}$'
-        f'\n\n$D_f$ = ${sp.latex(df)}$\n'
+        f'\n\n$D_f$ = ${latex(df)}$\n'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
@@ -59,7 +58,7 @@ def calc_inc(f : str = None):
     if f is None or len(f) == 0:
         popup_error('Função Inválida', 'Insira um valor válido para a função!', auto_close=True, auto_close_duration=5)
         return
-    vars = re.findall(r'[xyz]', f)
+    vars = findall(r'[xyz]', f)
     vars = list(set(vars))
 
     if len(vars) == 2:
@@ -69,23 +68,23 @@ def calc_inc(f : str = None):
         calc_inc_3(f)
 
 def calc_inc_2(f : str):
-    function = sp.simplify(re.sub(r'\^', '**', f))
+    function = simplify(sub(r'\^', '**', f))
 
-    x, y, dx, dy = sp.symbols('x y Δx Δy')
+    x, y, dx, dy = symbols('x y Δx Δy')
 
     def inpt_initial_values():
         layout = [
-            [sg.Text('Valor inicial de x:'), sg.Input(key='x0')],
-            [sg.Text('Valor inicial de y:'), sg.Input(key='y0')],
-            [sg.Button('OK'), sg.Button('Cancelar')]
+            [Text('Valor inicial de x:'), Input(key='x0')],
+            [Text('Valor inicial de y:'), Input(key='y0')],
+            [Button('OK'), Button('Cancelar')]
         ]
 
-        window = sg.Window('Pontos Iniciais', layout)
+        window = Window('Pontos Iniciais', layout)
 
         while True:
             evento, valores = window.read()
 
-            if evento == sg.WINDOW_CLOSED or evento == 'Cancelar':
+            if evento == WINDOW_CLOSED or evento == 'Cancelar':
                 break
 
             if evento == 'OK':
@@ -95,17 +94,17 @@ def calc_inc_2(f : str):
 
     def inpt_delta_values():
         layout = [
-            [sg.Text('Valor de Δx:'), sg.Input(key='dx')],
-            [sg.Text('Valor de Δy:'), sg.Input(key='dy')],
-            [sg.Button('OK'), sg.Button('Cancelar')]
+            [Text('Valor de Δx:'), Input(key='dx')],
+            [Text('Valor de Δy:'), Input(key='dy')],
+            [Button('OK'), Button('Cancelar')]
         ]
 
-        window = sg.Window('Pontos Iniciais', layout)
+        window = Window('Pontos Iniciais', layout)
 
         while True:
             evento, valores = window.read()
 
-            if evento == sg.WINDOW_CLOSED or evento == 'Cancelar':
+            if evento == WINDOW_CLOSED or evento == 'Cancelar':
                 window.close()
                 break
 
@@ -117,16 +116,16 @@ def calc_inc_2(f : str):
     vars_values = [inpt_initial_values()]
 
     if (vars_values[0]['x0'] == '') or (vars_values[0]['y0'] == ''):
-        sg.popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+        popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
         return
 
     vars_values.append(inpt_delta_values())
     if (vars_values[1]['dx'] == '') or (vars_values[1]['dy'] == ''):
-        sg.popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+        popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
         return
 
-    delta_x, delta_y = (sp.simplify(vars_values[1]["dx"]) + sp.simplify(vars_values[0]["x0"]),
-                        sp.simplify(vars_values[1]["dy"]) + sp.simplify(vars_values[0]["y0"]))
+    delta_x, delta_y = (simplify(vars_values[1]["dx"]) + simplify(vars_values[0]["x0"]),
+                        simplify(vars_values[1]["dy"]) + simplify(vars_values[0]["y0"]))
 
     init_f = function.subs({x: vars_values[0]["x0"], y : vars_values[0]["y0"]})
     final_f = function.subs({x: delta_x, y : delta_y})
@@ -141,24 +140,24 @@ def calc_inc_2(f : str):
     plot_eq(equacao_latex, 'Incremento de Função com 2 Variaveis')
 
 def calc_inc_3(f : str):
-    function = sp.simplify(re.sub(r'\^', '**', f))
+    function = simplify(sub(r'\^', '**', f))
 
-    x, y, z, dx, dy, dz= sp.symbols('x y z Δx Δy Δz')
+    x, y, z, dx, dy, dz= symbols('x y z Δx Δy Δz')
 
     def inpt_initial_values():
         layout = [
-            [sg.Text('Valor inicial de x:'), sg.Input(key='x0')],
-            [sg.Text('Valor inicial de y:'), sg.Input(key='y0')],
-            [sg.Text('Valor inicial de z:'), sg.Input(key='z0')],
-            [sg.Button('OK'), sg.Button('Cancelar')]
+            [Text('Valor inicial de x:'), Input(key='x0')],
+            [Text('Valor inicial de y:'), Input(key='y0')],
+            [Text('Valor inicial de z:'), Input(key='z0')],
+            [Button('OK'), Button('Cancelar')]
         ]
 
-        window = sg.Window('Pontos Iniciais', layout)
+        window = Window('Pontos Iniciais', layout)
 
         while True:
             evento, valores = window.read()
 
-            if evento == sg.WINDOW_CLOSED or evento == 'Cancelar':
+            if evento == WINDOW_CLOSED or evento == 'Cancelar':
                 break
 
             if evento == 'OK':
@@ -168,18 +167,18 @@ def calc_inc_3(f : str):
 
     def inpt_delta_values():
         layout = [
-            [sg.Text('Valor de Δx:'), sg.Input(key='dx')],
-            [sg.Text('Valor de Δy:'), sg.Input(key='dy')],
-            [sg.Text('Valor de Δz:'), sg.Input(key='dz')],
-            [sg.Button('OK'), sg.Button('Cancelar')]
+            [Text('Valor de Δx:'), Input(key='dx')],
+            [Text('Valor de Δy:'), Input(key='dy')],
+            [Text('Valor de Δz:'), Input(key='dz')],
+            [Button('OK'), Button('Cancelar')]
         ]
 
-        window = sg.Window('Pontos Iniciais', layout)
+        window = Window('Pontos Iniciais', layout)
 
         while True:
             evento, valores = window.read()
 
-            if evento == sg.WINDOW_CLOSED or evento == 'Cancelar':
+            if evento == WINDOW_CLOSED or evento == 'Cancelar':
                 window.close()
                 break
 
@@ -191,17 +190,17 @@ def calc_inc_3(f : str):
     vars_values = [inpt_initial_values()]
 
     if (vars_values[0]['x0'] == '') or (vars_values[0]['y0'] == '') or (vars_values[0]['z0'] == ''):
-        sg.popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+        popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
         return
 
     vars_values.append(inpt_delta_values())
     if (vars_values[1]['dx'] == '') or (vars_values[1]['dy'] == '') or (vars_values[1]['dz'] == ''):
-        sg.popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+        popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
         return
 
-    delta_x, delta_y, delta_z = (sp.simplify(vars_values[1]["dx"]) + sp.simplify(vars_values[0]["x0"]), sp.simplify(
-        vars_values[1]["dy"]) + sp.simplify(vars_values[0]["y0"]),
-        sp.simplify(vars_values[1]["dz"]) + sp.simplify(vars_values[0]["z0"]))
+    delta_x, delta_y, delta_z = (simplify(vars_values[1]["dx"]) + simplify(vars_values[0]["x0"]), simplify(
+        vars_values[1]["dy"]) + simplify(vars_values[0]["y0"]),
+        simplify(vars_values[1]["dz"]) + simplify(vars_values[0]["z0"]))
 
     init_f = function.subs({x: vars_values[0]["x0"], y: vars_values[0]["y0"], z: vars_values[0]['z0']})
     final_f = function.subs({x: delta_x, y: delta_y, z: delta_z})
@@ -221,15 +220,15 @@ def plot_eq(equacao_latex, title):
     """
     font_size = max(15 - len(equacao_latex) // 20, 14)
 
-    figura, ax = plt.subplots()
+    figura, ax = subplots()
     ax.text(0.5, 0.5, f"{equacao_latex}", horizontalalignment='center',
             verticalalignment='baseline', fontsize=font_size)
     ax.axis('off')  # Desligar os eixos para focar na equação
 
     # Desenhar no PySimpleGUI
-    layout = [[sg.Canvas(key='canvas')]]
+    layout = [[Canvas(key='canvas')]]
 
-    window = sg.Window(title, layout, finalize=True, auto_size_text=True)
+    window = Window(title, layout, finalize=True, auto_size_text=True)
 
     # Conectar o Canvas do Matplotlib ao PySimpleGUI
     canvas_elem = window['canvas']
@@ -239,7 +238,7 @@ def plot_eq(equacao_latex, title):
 
     while True:
         evento, _ = window.read()
-        if evento == sg.WINDOW_CLOSED:
+        if evento == WINDOW_CLOSED:
             break
 
     window.close()

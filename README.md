@@ -2,9 +2,7 @@
 
 <h2>Descrição:</h2>
 
-Este script Python, com interface gráfica desenvolvida utilizando Tkinter (você pode substituir por outras bibliotecas como PyQt ou wxPython), fornece uma ferramenta intuitiva para o cálculo numérico de incrementos de funções de até três variáveis. Ele é perfeito para:
-
-* Estudantes: Visualizar conceitos de cálculo diferencial de forma prática.
+Este script Python, com interface gráfica desenvolvida utilizando PySimpeGUI, fornece uma ferramenta intuitiva para o cálculo numérico de incrementos e diferenciais de funções de até três variáveis
 
 <h2>Funcionalidades:</h2>
 

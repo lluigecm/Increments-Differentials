@@ -30,7 +30,8 @@ def calc_diff_2(f : str):
     df = dx*df_dx + dy*df_dy
 
     equacao_latex =(
-        f'Diferencial de f(x,y): ${sp.latex(df)}$ \n'
+        f'Diferencial da função $f(x,y)$ = ${f}$'
+        f'\n\n$D_f$ = ${sp.latex(df)}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial')
@@ -48,7 +49,8 @@ def calc_diff_3(f : str):
     df = df_dx*dx + df_dy*dy + df_dz*dz
 
     equacao_latex = (
-        f'Diferencial de f(x,y,z) = ${sp.latex(df)}$\n'
+        f'Diferencial da função f(x,y,z) = ${f}$'
+        f'\n\n$D_f$ = ${sp.latex(df)}$\n'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
@@ -131,7 +133,10 @@ def calc_inc_2(f : str):
 
     delta_f = final_f - init_f
     equacao_latex = (
-        f'Incremento de f(x,y)\n Δf = ${delta_f}$\n'
+        f'Incremento de f(x,y) = ${f}$'
+        f'\n$x_0$ = {vars_values[0]["x0"]}\t$y_0$ = {vars_values[0]["y0"]}'
+        f'\n$Δx$ = {vars_values[1]["dx"]}\t$Δy$ = {vars_values[1]["dy"]}\n\n'
+        f'\n Δf = ${delta_f}$\n'
     )
     plot_eq(equacao_latex, 'Incremento de Função com 2 Variaveis')
 
@@ -203,7 +208,10 @@ def calc_inc_3(f : str):
 
     delta_f = final_f - init_f
     equacao_latex = (
-        f'Incremento de f(x,y)\n Δf = ${delta_f}$\n'
+        f'Incremento de f(x,y,z) = ${f}$'
+        f'\n $x_0$ = {vars_values[0]["x0"]}\t$y_0$ = {vars_values[0]["y0"]}\t$z_0$ = {vars_values[0]["z0"]}'
+        f'\n $Δx$ = {vars_values[1]["dx"]}\t$Δy$ = {vars_values[1]["dy"]}\t$Δz$ ={vars_values[1]["dz"]}'
+        f'\n\n Δf = ${delta_f}$'
     )
     plot_eq(equacao_latex, 'Incremento de Função com 3 Variaveis')
 
@@ -214,7 +222,8 @@ def plot_eq(equacao_latex, title):
     font_size = max(15 - len(equacao_latex) // 20, 14)
 
     figura, ax = plt.subplots()
-    ax.text(0.5, 0.5, f"{equacao_latex}", horizontalalignment='center', verticalalignment='center', fontsize=font_size)
+    ax.text(0.5, 0.5, f"{equacao_latex}", horizontalalignment='center',
+            verticalalignment='baseline', fontsize=font_size)
     ax.axis('off')  # Desligar os eixos para focar na equação
 
     # Desenhar no PySimpleGUI

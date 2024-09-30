@@ -1,4 +1,4 @@
-from PySimpleGUI import popup_error, Text, Button, WINDOW_CLOSED, Input, Window, Canvas
+from PySimpleGUI import popup_error, Text, Button, WINDOW_CLOSED, Input, Window, Canvas, popup_yes_no, popup_notify
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from re import findall, sub
 from matplotlib.pyplot import subplots
@@ -21,38 +21,46 @@ def calc_diff(f : str = None):
 def calc_diff_2(f : str):
     function = sub(r'\^', '**', f)
 
-    x, y, dx, dy = symbols('x y dx dy')
+    resp = popup_yes_no("Calcular valor funcional da diferencial?")
 
-    df_dx = diff(function, x)
-    df_dy = diff(function, y)
+    if resp == "No":
+        x, y, dx, dy = symbols('x y dx dy')
 
-    df = dx*df_dx + dy*df_dy
+        df_dx = diff(function, x)
+        df_dy = diff(function, y)
 
-    equacao_latex =(
-        f'Diferencial da função $f(x,y)$ = ${f}$'
-        f'\n\n$D_f$ = ${latex(df)}$'
-    )
+        df = dx*df_dx + dy*df_dy
 
-    plot_eq(equacao_latex, 'Diferencial')
+        equacao_latex =(
+            f'Diferencial da função $f(x,y)$ = ${f}$'
+            f'\n\n$D_f$ = ${latex(df)}$'
+        )
+
+        plot_eq(equacao_latex, 'Diferencial')
+
 
 def calc_diff_3(f : str):
     function = sub(r'\^', '**', f)
 
-    x, y, z = symbols('x y z')
-    dx, dy, dz = symbols('dx dy dz')
+    resp = popup_yes_no("Calcular valor funcional da diferencial?")
 
-    df_dx = diff(function, x)
-    df_dy = diff(function, y)
-    df_dz = diff(function, z)
+    if resp == "No":
+        x, y, z = symbols('x y z')
+        dx, dy, dz = symbols('dx dy dz')
 
-    df = df_dx*dx + df_dy*dy + df_dz*dz
+        df_dx = diff(function, x)
+        df_dy = diff(function, y)
+        df_dz = diff(function, z)
 
-    equacao_latex = (
-        f'Diferencial da função f(x,y,z) = ${f}$'
-        f'\n\n$D_f$ = ${latex(df)}$\n'
-    )
+        df = df_dx*dx + df_dy*dy + df_dz*dz
 
-    plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
+        equacao_latex = (
+            f'Diferencial da função f(x,y,z) = ${f}$'
+            f'\n\n$D_f$ = ${latex(df)}$\n'
+        )
+
+        plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
+
 
 def calc_inc(f : str = None):
     if f is None or len(f) == 0:

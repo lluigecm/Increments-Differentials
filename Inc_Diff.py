@@ -19,25 +19,90 @@ def calc_diff(f : str = None):
         calc_diff_3(f)
 
 def calc_diff_2(f : str):
-    function = sub(r'\^', '**', f)
+    function = simplify(sub(r'\^', '**', f))
+
+    x, y, dx, dy = symbols('x y dx dy')
+
+    df_dx = diff(function, x)
+    df_dy = diff(function, y)
+
+    df = dx * df_dx + dy * df_dy
+
+    def inpt_initial_values():
+        layout = [
+            [Text('Valor inicial de x:'), Input(key='x0')],
+            [Text('Valor inicial de y:'), Input(key='y0')],
+            [Button('OK'), Button('Cancelar')]
+        ]
+
+        window = Window('Pontos Iniciais', layout)
+
+        while True:
+            evento, valores = window.read()
+
+            if evento == WINDOW_CLOSED or evento == 'Cancelar':
+                break
+
+            if evento == 'OK':
+                break
+        window.close()
+        return valores
+
+    def inpt_diff_values():
+        layout = [
+            [Text('Valor de dx:'), Input(key='dx')],
+            [Text('Valor de dy:'), Input(key='dy')],
+            [Button('OK'), Button('Cancelar')]
+        ]
+
+        window = Window('Pontos Iniciais', layout)
+
+        while True:
+            evento, valores = window.read()
+
+            if evento == WINDOW_CLOSED or evento == 'Cancelar':
+                window.close()
+                break
+
+            if evento == 'OK':
+                break
+        window.close()
+        return valores
 
     resp = popup_yes_no("Calcular valor funcional da diferencial?")
 
     if resp == "No":
-        x, y, dx, dy = symbols('x y dx dy')
-
-        df_dx = diff(function, x)
-        df_dy = diff(function, y)
-
-        df = dx*df_dx + dy*df_dy
-
         equacao_latex =(
             f'Diferencial da função $f(x,y)$ = ${f}$'
             f'\n\n$D_f$ = ${latex(df)}$'
         )
 
         plot_eq(equacao_latex, 'Diferencial')
+        return
 
+    vars_values = [inpt_initial_values()]
+    if (vars_values[0]['x0'] == '') or (vars_values[0]['y0'] == ''):
+        popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+        return
+
+    vars_values.append(inpt_diff_values())
+    if (vars_values[1]['dx'] == '') or (vars_values[1]['dy'] == ''):
+        popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+        return
+
+    x0, y0, diffx, diffy = (simplify(vars_values[0]["x0"]), simplify(vars_values[0]["y0"]),
+                      simplify(vars_values[1]["dx"]), simplify(vars_values[1]["dy"]))
+
+    df_total = simplify(df.subs({x: x0, y: y0, dx: diffx, dy: diffy}))
+
+    equacao_latex = (
+        f'Diferencial da função $f(x,y)$ = ${f}$'
+        f'\n\n$x_0$ = {x0}\t$y_0$ = {y0}'
+        f'\n$dx$ = {diffx}\t$dy$ = {diffy}\n\n'
+        f'\n\n$D_f$ = ${df_total}$'
+    )
+
+    plot_eq(equacao_latex, 'Diferencial de Função com duas variáveis')
 
 def calc_diff_3(f : str):
     function = sub(r'\^', '**', f)

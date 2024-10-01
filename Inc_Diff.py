@@ -38,15 +38,19 @@ def calc_diff_2(f : str):
         window = Window('Pontos Iniciais', layout)
 
         while True:
-            evento, valores = window.read()
+            event, values = window.read()
 
-            if evento == WINDOW_CLOSED or evento == 'Cancelar':
+            if event == WINDOW_CLOSED or event == 'Cancelar':
                 break
 
-            if evento == 'OK':
+            if values == '':
+                popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+                return
+
+            if event == 'OK':
                 break
         window.close()
-        return valores
+        return values
 
     def inpt_diff_values():
         layout = [
@@ -58,16 +62,19 @@ def calc_diff_2(f : str):
         window = Window('Pontos Iniciais', layout)
 
         while True:
-            evento, valores = window.read()
+            event, values = window.read()
 
-            if evento == WINDOW_CLOSED or evento == 'Cancelar':
-                window.close()
+            if event == WINDOW_CLOSED or event == 'Cancelar':
                 break
 
-            if evento == 'OK':
+            if values == '':
+                popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+                return
+
+            if event == 'OK':
                 break
         window.close()
-        return valores
+        return values
 
     resp = popup_yes_no("Calcular valor funcional da diferencial?")
 
@@ -97,9 +104,10 @@ def calc_diff_2(f : str):
 
     equacao_latex = (
         f'Diferencial da função $f(x,y)$ = ${f}$'
-        f'\n\n$x_0$ = {x0}\t$y_0$ = {y0}'
-        f'\n$dx$ = {diffx}\t$dy$ = {diffy}\n\n'
-        f'\n\n$D_f$ = ${df_total}$'
+        f'\n\n$x_0$ = ${x0:.2f}$\t$y_0$ = ${y0:.2f}$'
+        f'\n$dx$ = ${diffx:.2f}$\t$dy$ = ${diffy:.2f}$\n\n'
+        f'\n$D_f$ = ${df}$'
+        f'\n\n$D_f$ = ${df_total:.2f}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com duas variáveis')
@@ -107,25 +115,101 @@ def calc_diff_2(f : str):
 def calc_diff_3(f : str):
     function = sub(r'\^', '**', f)
 
+    x, y, z = symbols('x y z')
+    dx, dy, dz = symbols('dx dy dz')
+
+    df_dx = diff(function, x)
+    df_dy = diff(function, y)
+    df_dz = diff(function, z)
+
+    df = df_dx * dx + df_dy * dy + df_dz * dz
+
+    def inpt_initial_values():
+        layout = [
+            [Text('Valor inicial de x:'), Input(key='x0')],
+            [Text('Valor inicial de y:'), Input(key='y0')],
+            [Text('Valor inicial de z:'), Input(key='z0')],
+            [Button('OK'), Button('Cancelar')]
+        ]
+
+        window = Window('Pontos Iniciais', layout)
+
+        while True:
+            event, values = window.read()
+
+            if event == WINDOW_CLOSED or event == 'Cancelar':
+                break
+
+            if values == '':
+                popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+                return
+
+            if event == 'OK':
+                break
+        window.close()
+        return values
+
+    def inpt_diff_values():
+        layout = [
+            [Text('Valor de dx:'), Input(key='dx')],
+            [Text('Valor de dy:'), Input(key='dy')],
+            [Text('Valor de dz:'), Input(key='dz')],
+            [Button('OK'), Button('Cancelar')]
+        ]
+
+        window = Window('Pontos Iniciais', layout)
+
+        while True:
+            event, values = window.read()
+
+            if event == WINDOW_CLOSED or event == 'Cancelar':
+                break
+
+            if values == '':
+                popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+                return
+
+            if event == 'OK':
+                break
+        window.close()
+        return values
+
     resp = popup_yes_no("Calcular valor funcional da diferencial?")
 
     if resp == "No":
-        x, y, z = symbols('x y z')
-        dx, dy, dz = symbols('dx dy dz')
-
-        df_dx = diff(function, x)
-        df_dy = diff(function, y)
-        df_dz = diff(function, z)
-
-        df = df_dx*dx + df_dy*dy + df_dz*dz
-
         equacao_latex = (
             f'Diferencial da função f(x,y,z) = ${f}$'
             f'\n\n$D_f$ = ${latex(df)}$\n'
         )
 
         plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
+        return
 
+    vars_values = [inpt_initial_values()]
+    if (vars_values[0]['x0'] == '') or (vars_values[0]['y0'] == '') or (vars_values[0]['z0'] == ''):
+        popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+        return
+
+    vars_values.append(inpt_diff_values())
+    if (vars_values[1]['dx'] == '') or (vars_values[1]['dy'] == '') or (vars_values[1]['dz'] == ''):
+        popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+        return
+
+    x0, y0, z0, diffx, diffy, diffz = (simplify(vars_values[0]["x0"]), simplify(vars_values[0]["y0"]),
+                                simplify(vars_values[0]["z0"]), simplify(vars_values[1]["dx"]),
+                                simplify(vars_values[1]["dy"]), simplify(vars_values[1]["dz"]))
+
+    df_total = simplify(df.subs({x: x0, y: y0, z: z0, dx: diffx, dy: diffy, dz: diffz}))
+
+    equacao_latex = (
+        f'Diferencial da função f(x,y,z) = ${f}$'
+        f'\n\n$x_0$ = {x0}\t$y_0$ = {y0}\t$z_0$ = {z0}'
+        f'\n$dx$ = ${diffx:.2f}$\t$dy$ = ${diffy:.2f}$\t$dz$ = ${diffz:.2f}$\n\n'
+        f'\n$D_f$ = ${df}$'
+        f'\n\n$D_f$ = ${df_total:.2f}$'
+    )
+
+    plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
 
 def calc_inc(f : str = None):
     if f is None or len(f) == 0:
@@ -155,15 +239,19 @@ def calc_inc_2(f : str):
         window = Window('Pontos Iniciais', layout)
 
         while True:
-            evento, valores = window.read()
+            event, values = window.read()
 
-            if evento == WINDOW_CLOSED or evento == 'Cancelar':
+            if event == WINDOW_CLOSED or event == 'Cancelar':
                 break
 
-            if evento == 'OK':
+            if values == '':
+                popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+                return
+
+            if event == 'OK':
                 break
         window.close()
-        return valores
+        return values
 
     def inpt_delta_values():
         layout = [
@@ -175,16 +263,19 @@ def calc_inc_2(f : str):
         window = Window('Pontos Iniciais', layout)
 
         while True:
-            evento, valores = window.read()
+            event, values = window.read()
 
-            if evento == WINDOW_CLOSED or evento == 'Cancelar':
-                window.close()
+            if event == WINDOW_CLOSED or event == 'Cancelar':
                 break
 
-            if evento == 'OK':
+            if values == '':
+                popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+                return
+
+            if event == 'OK':
                 break
         window.close()
-        return valores
+        return values
 
     vars_values = [inpt_initial_values()]
 
@@ -206,9 +297,9 @@ def calc_inc_2(f : str):
     delta_f = final_f - init_f
     equacao_latex = (
         f'Incremento de f(x,y) = ${f}$'
-        f'\n$x_0$ = {vars_values[0]["x0"]}\t$y_0$ = {vars_values[0]["y0"]}'
-        f'\n$Δx$ = {vars_values[1]["dx"]}\t$Δy$ = {vars_values[1]["dy"]}\n\n'
-        f'\n Δf = ${delta_f}$\n'
+        f'\n$x_0$ = ${vars_values[0]["x0"]:.2f}$\t$y_0$ = ${vars_values[0]["y0"]:.2f}$'
+        f'\n$Δx$ = ${vars_values[1]["dx"]:.2f}$\t$Δy$ = ${vars_values[1]["dy"]:.2f}$\n\n'
+        f'\n Δf = ${delta_f:.2f}$\n'
     )
     plot_eq(equacao_latex, 'Incremento de Função com 2 Variaveis')
 
@@ -228,15 +319,19 @@ def calc_inc_3(f : str):
         window = Window('Pontos Iniciais', layout)
 
         while True:
-            evento, valores = window.read()
+            event, values = window.read()
 
-            if evento == WINDOW_CLOSED or evento == 'Cancelar':
+            if event == WINDOW_CLOSED or event == 'Cancelar':
                 break
 
-            if evento == 'OK':
+            if values == '':
+                popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+                return
+
+            if event == 'OK':
                 break
         window.close()
-        return valores
+        return values
 
     def inpt_delta_values():
         layout = [
@@ -249,16 +344,19 @@ def calc_inc_3(f : str):
         window = Window('Pontos Iniciais', layout)
 
         while True:
-            evento, valores = window.read()
+            event, values = window.read()
 
-            if evento == WINDOW_CLOSED or evento == 'Cancelar':
-                window.close()
+            if event == WINDOW_CLOSED or event == 'Cancelar':
                 break
 
-            if evento == 'OK':
+            if values == '':
+                popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
+                return
+
+            if event == 'OK':
                 break
         window.close()
-        return valores
+        return values
 
     vars_values = [inpt_initial_values()]
 
@@ -281,9 +379,9 @@ def calc_inc_3(f : str):
     delta_f = final_f - init_f
     equacao_latex = (
         f'Incremento de f(x,y,z) = ${f}$'
-        f'\n $x_0$ = {vars_values[0]["x0"]}\t$y_0$ = {vars_values[0]["y0"]}\t$z_0$ = {vars_values[0]["z0"]}'
-        f'\n $Δx$ = {vars_values[1]["dx"]}\t$Δy$ = {vars_values[1]["dy"]}\t$Δz$ ={vars_values[1]["dz"]}'
-        f'\n\n Δf = ${delta_f}$'
+        f'\n $x_0$ = ${vars_values[0]["x0"]:.2f}$\t$y_0$ = ${vars_values[0]["y0"]:.2f}$\t$z_0$ = ${vars_values[0]["z0"]:.2f}$'
+        f'\n $Δx$ = ${vars_values[1]["dx"]:.2f}$\t$Δy$ = ${vars_values[1]["dy"]:.2f}$\t$Δz$ = ${vars_values[1]["dz"]:.2f}$'
+        f'\n\n Δf = ${delta_f:.2f}$'
     )
     plot_eq(equacao_latex, 'Incremento de Função com 3 Variaveis')
 
@@ -310,8 +408,8 @@ def plot_eq(equacao_latex, title):
     canvas.get_tk_widget().pack()
 
     while True:
-        evento, _ = window.read()
-        if evento == WINDOW_CLOSED:
+        event, _ = window.read()
+        if event == WINDOW_CLOSED:
             break
 
     window.close()

@@ -20,7 +20,6 @@ class GUI:
         while True:
             event, values = window.read()
 
-            # if user closes window or clicks cancel
             if event == WIN_CLOSED:
                 break
 

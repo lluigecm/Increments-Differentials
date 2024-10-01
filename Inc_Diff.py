@@ -30,8 +30,8 @@ def calc_diff_2(f : str):
 
     def inpt_initial_values():
         layout = [
-            [Text('Valor inicial de x:'), Input(key='x0')],
-            [Text('Valor inicial de y:'), Input(key='y0')],
+            [Text('Valor de x0:'), Input(key='x0')],
+            [Text('Valor de y0:'), Input(key='y0')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -126,9 +126,9 @@ def calc_diff_3(f : str):
 
     def inpt_initial_values():
         layout = [
-            [Text('Valor inicial de x:'), Input(key='x0')],
-            [Text('Valor inicial de y:'), Input(key='y0')],
-            [Text('Valor inicial de z:'), Input(key='z0')],
+            [Text('Valor de x0:'), Input(key='x0')],
+            [Text('Valor de y0:'), Input(key='y0')],
+            [Text('Valor de z0:'), Input(key='z0')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -231,8 +231,8 @@ def calc_inc_2(f : str):
 
     def inpt_initial_values():
         layout = [
-            [Text('Valor inicial de x:'), Input(key='x0')],
-            [Text('Valor inicial de y:'), Input(key='y0')],
+            [Text('Valor de x0:'), Input(key='x0')],
+            [Text('Valor de y0:'), Input(key='y0')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -310,9 +310,9 @@ def calc_inc_3(f : str):
 
     def inpt_initial_values():
         layout = [
-            [Text('Valor inicial de x:'), Input(key='x0')],
-            [Text('Valor inicial de y:'), Input(key='y0')],
-            [Text('Valor inicial de z:'), Input(key='z0')],
+            [Text('Valor de x0:'), Input(key='x0')],
+            [Text('Valor de y0:'), Input(key='y0')],
+            [Text('Valor de z0:'), Input(key='z0')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -394,14 +394,14 @@ def plot_eq(equacao_latex, title):
     figura, ax = subplots()
     ax.text(0.5, 0.5, f"{equacao_latex}", horizontalalignment='center',
             verticalalignment='baseline', fontsize=font_size)
-    ax.axis('off')  # Desligar os eixos para focar na equação
+    ax.axis('off')  # Desliga os eixos para focar na equação
 
-    # Desenhar no PySimpleGUI
+    # Desenha no PySimpleGUI
     layout = [[Canvas(key='canvas')]]
 
     window = Window(title, layout, finalize=True, auto_size_text=True)
 
-    # Conectar o Canvas do Matplotlib ao PySimpleGUI
+    # Conecta o Canvas do Matplotlib ao PySimpleGUI
     canvas_elem = window['canvas']
     canvas = FigureCanvasTkAgg(figura, canvas_elem.TKCanvas)
     canvas.draw()

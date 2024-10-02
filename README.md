@@ -6,7 +6,7 @@ Este script Python, com interface gráfica desenvolvida utilizando PySimpeGUI, f
 
 <h2>Funcionalidades:</h2>
 
-* Suporta funções matemáticas de até três variáveis, usando a sintaxe padrão matemática (ex: x^2 + 2&asty&astz).
+* Suporta funções matemáticas de até três variáveis, usando a sintaxe padrão matemática (ex: x^2 + 2"&ast"y"&ast"z).
 * Cálculo de incrementos: Calcula o valor da função em um ponto e em um ponto ligeiramente deslocado, permitindo estimar o incremento numérico.
 * Cálculo de Diferenciais: Calcula o valor algébrico do diferencial da função, e permite estimar a diferencial numérica
 * Interface gráfica amigável: Campos de entrada para a função, variáveis e incremento, além de um botão para calcular e exibir o resultado.

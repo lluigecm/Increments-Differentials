@@ -1,27 +1,52 @@
-from PySimpleGUI import popup_error, Text, Button, WINDOW_CLOSED, Input, Window, Canvas, popup_yes_no, popup_notify
+from PySimpleGUI import popup_error, Text, Button, WINDOW_CLOSED, Input, Window, Canvas, popup_yes_no
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from re import findall, sub
 from matplotlib.pyplot import subplots
 from sympy import symbols, diff, latex, simplify
+from time import time
 
-
-def calc_diff(f : str = None):
+def verify_error(f : str):
+    """
+    Verifica se a função inserida é válida
+    """
     if f is None or len(f) == 0:
         popup_error('Função Inválida', 'Insira um valor válido para a função!', auto_close=True, auto_close_duration=5)
+        return False
+
+    if len(set(findall(r'[a-z]', f))) < 2 or len(set(findall(r'[a-z]', f))) > 3:
+        popup_error('Função Inválida', 'Insira uma função com 2 a 3 variáveis!', auto_close=True, auto_close_duration=5)
+        return False
+
+    if (len(findall('[(]', f)) != len(findall('[)]', f))):
+        popup_error('Função Inválida', 'Insira uma função válida!', auto_close=True, auto_close_duration=5)
+        return False
+    return True
+
+def calc_diff(f : str = None):
+    """
+    Determina se a função tem 2 ou 3 variáveis e chama a função correspondente
+    """
+    if not verify_error(f):
         return
-    vars = findall(r'[xyz]', f)
-    vars = list(set(vars))
+
+    vars = findall(r'[a-z]', f)
+    vars = sorted(list(set(vars)))
 
     if len(vars) == 2:
-        calc_diff_2(f)
+        calc_diff_2(f, vars)
 
     if len(vars) == 3:
-        calc_diff_3(f)
+        calc_diff_3(f, vars)
 
-def calc_diff_2(f : str):
+def calc_diff_2(f : str, vars : list):
+    """
+    Calcula a diferencial de uma função com 2 variáveis
+    """
     function = simplify(sub(r'\^', '**', f))
 
-    x, y, dx, dy = symbols('x y dx dy')
+    var_dx, var_dy = symbols("d"+vars[0]), symbols("d"+vars[1])
+
+    x, y, dx, dy = symbols(f'{vars[0]} {vars[1]} {var_dx} {var_dy}')
 
     df_dx = diff(function, x)
     df_dy = diff(function, y)
@@ -30,8 +55,8 @@ def calc_diff_2(f : str):
 
     def inpt_initial_values():
         layout = [
-            [Text('Valor de x0:'), Input(key='x0')],
-            [Text('Valor de y0:'), Input(key='y0')],
+            [Text(f'Valor de {vars[0]}0:'), Input(key='x0')],
+            [Text(f'Valor de {vars[1]}0:'), Input(key='y0')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -54,8 +79,8 @@ def calc_diff_2(f : str):
 
     def inpt_diff_values():
         layout = [
-            [Text('Valor de dx:'), Input(key='dx')],
-            [Text('Valor de dy:'), Input(key='dy')],
+            [Text(f'Valor de d{vars[0]}:'), Input(key='dx')],
+            [Text(f'Valor de d{vars[1]}:'), Input(key='dy')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -104,19 +129,24 @@ def calc_diff_2(f : str):
 
     equacao_latex = (
         f'Diferencial da função $f(x,y)$ = ${f}$'
-        f'\n\n$x_0$ = ${x0:.2f}$\t$y_0$ = ${y0:.2f}$'
-        f'\n$dx$ = ${diffx:.2f}$\t$dy$ = ${diffy:.2f}$\n\n'
-        f'\n$D_f$ = ${df}$'
+        f'\n\n${vars[0]}_0$ = ${x0:.2f}$\t${vars[1]}_0$ = ${y0:.2f}$'
+        f'\n$d{vars[0]}$ = ${diffx:.2f}$\t$d{vars[1]}$ = ${diffy:.2f}$\n\n'
+        f'\n$D_f$ = ${latex(df)}$'
         f'\n\n$D_f$ = ${df_total:.2f}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com duas variáveis')
 
-def calc_diff_3(f : str):
+def calc_diff_3(f : str, vars : list):
+    """
+    Calcula a diferencial de uma função com 3 variáveis
+    """
     function = sub(r'\^', '**', f)
 
-    x, y, z = symbols('x y z')
-    dx, dy, dz = symbols('dx dy dz')
+    var_dx, var_dy, var_dz = symbols("d"+vars[0]), symbols("d"+vars[1]), symbols("d"+vars[2])
+
+    x, y, z = symbols(f'{vars[0]} {vars[1]} {vars[2]}')
+    dx, dy, dz = symbols(f'{var_dx} {var_dy} {var_dz}')
 
     df_dx = diff(function, x)
     df_dy = diff(function, y)
@@ -126,9 +156,9 @@ def calc_diff_3(f : str):
 
     def inpt_initial_values():
         layout = [
-            [Text('Valor de x0:'), Input(key='x0')],
-            [Text('Valor de y0:'), Input(key='y0')],
-            [Text('Valor de z0:'), Input(key='z0')],
+            [Text(f'Valor de {vars[0]}0:'), Input(key='x0')],
+            [Text(f'Valor de {vars[1]}0:'), Input(key='y0')],
+            [Text(f'Valor de {vars[2]}0:'), Input(key='z0')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -151,9 +181,9 @@ def calc_diff_3(f : str):
 
     def inpt_diff_values():
         layout = [
-            [Text('Valor de dx:'), Input(key='dx')],
-            [Text('Valor de dy:'), Input(key='dy')],
-            [Text('Valor de dz:'), Input(key='dz')],
+            [Text(f'Valor de d{vars[0]}:'), Input(key='dx')],
+            [Text(f'Valor de d{vars[1]}:'), Input(key='dy')],
+            [Text(f'Valor de d{vars[2]}:'), Input(key='dz')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -178,7 +208,7 @@ def calc_diff_3(f : str):
 
     if resp == "No":
         equacao_latex = (
-            f'Diferencial da função f(x,y,z) = ${f}$'
+            f'Diferencial da função f({vars[0]},{vars[1]},{vars[2]}) = ${f}$'
             f'\n\n$D_f$ = ${latex(df)}$\n'
         )
 
@@ -202,37 +232,43 @@ def calc_diff_3(f : str):
     df_total = simplify(df.subs({x: x0, y: y0, z: z0, dx: diffx, dy: diffy, dz: diffz}))
 
     equacao_latex = (
-        f'Diferencial da função f(x,y,z) = ${f}$'
-        f'\n\n$x_0$ = {x0}\t$y_0$ = {y0}\t$z_0$ = {z0}'
-        f'\n$dx$ = ${diffx:.2f}$\t$dy$ = ${diffy:.2f}$\t$dz$ = ${diffz:.2f}$\n\n'
-        f'\n$D_f$ = ${df}$'
+        f'Diferencial da função f({vars[0]},{vars[1]},{vars[2]}) = ${f}$'
+        f'\n\n${vars[0]}_0$ = {x0}\t${vars[1]}_0$ = {y0}\t${vars[2]}_0$ = {z0}'
+        f'\n$d{vars[0]}$ = ${diffx:.2f}$\t$d{vars[1]}$ = ${diffy:.2f}$\t$d{vars[2]}$ = ${diffz:.2f}$\n\n'
+        f'\n$D_f$ = ${latex(df)}$'
         f'\n\n$D_f$ = ${df_total:.2f}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
 
 def calc_inc(f : str = None):
-    if f is None or len(f) == 0:
-        popup_error('Função Inválida', 'Insira um valor válido para a função!', auto_close=True, auto_close_duration=5)
+    """
+    Determina se a função tem 2 ou 3 variáveis e chama a função correspondente
+    """
+    if not verify_error(f):
         return
-    vars = findall(r'[xyz]', f)
-    vars = list(set(vars))
+
+    vars = findall(r'[a-z]', f)
+    vars = sorted(list(set(vars)))
 
     if len(vars) == 2:
-        calc_inc_2(f)
+        calc_inc_2(f, vars)
 
     if len(vars) == 3:
-        calc_inc_3(f)
+        calc_inc_3(f, vars)
 
-def calc_inc_2(f : str):
+def calc_inc_2(f : str, vars : list):
+    """
+    Calcula o incremento de uma função com 2 variáveis
+    """
     function = simplify(sub(r'\^', '**', f))
 
-    x, y, dx, dy = symbols('x y Δx Δy')
+    x, y = symbols(f'{vars[0]} {vars[1]}')
 
     def inpt_initial_values():
         layout = [
-            [Text('Valor de x0:'), Input(key='x0')],
-            [Text('Valor de y0:'), Input(key='y0')],
+            [Text(f'Valor de {vars[0]}0:'), Input(key='x0')],
+            [Text(f'Valor de {vars[1]}0:'), Input(key='y0')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -255,8 +291,8 @@ def calc_inc_2(f : str):
 
     def inpt_delta_values():
         layout = [
-            [Text('Valor de Δx:'), Input(key='dx')],
-            [Text('Valor de Δy:'), Input(key='dy')],
+            [Text(f'Valor de Δ{vars[0]}:'), Input(key='dx')],
+            [Text(f'Valor de Δ{vars[1]}:'), Input(key='dy')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -294,25 +330,28 @@ def calc_inc_2(f : str):
     init_f = function.subs({x: vars_values[0]["x0"], y : vars_values[0]["y0"]})
     final_f = function.subs({x: delta_x, y : delta_y})
 
-    delta_f = final_f - init_f
+    delta_f = round((final_f - init_f), 2)
     equacao_latex = (
-        f'Incremento de f(x,y) = ${f}$'
-        f'\n$x_0$ = ${vars_values[0]["x0"]:.2f}$\t$y_0$ = ${vars_values[0]["y0"]:.2f}$'
-        f'\n$Δx$ = ${vars_values[1]["dx"]:.2f}$\t$Δy$ = ${vars_values[1]["dy"]:.2f}$\n\n'
-        f'\n Δf = ${delta_f:.2f}$\n'
+        'Incremento de f('+vars[0]+','+vars[1]+') = $'+f+'$'
+        '\n $'+vars[0]+'_0$ = $'+str(vars_values[0]["x0"])+'$\t$'+vars[1]+'_0$ = $'+str(vars_values[0]["y0"])+'$'
+        '\n $Δ'+vars[0]+'$ = $'+str(vars_values[1]["dx"])+'$\t$Δ'+vars[1]+'$ = $'+str(vars_values[1]["dy"])+'$'
+        '\n\n Δf = $'+str(delta_f)+'$'
     )
     plot_eq(equacao_latex, 'Incremento de Função com 2 Variaveis')
 
-def calc_inc_3(f : str):
+def calc_inc_3(f : str, vars : list):
+    """
+    Calcula o incremento de uma função com 3 variáveis
+    """
     function = simplify(sub(r'\^', '**', f))
 
-    x, y, z, dx, dy, dz= symbols('x y z Δx Δy Δz')
+    x, y, z, dx, dy, dz = symbols(f'{vars[0]} {vars[1]} {vars[2]} Δ{vars[0]} Δ{vars[1]} Δ{vars[2]}')
 
     def inpt_initial_values():
         layout = [
-            [Text('Valor de x0:'), Input(key='x0')],
-            [Text('Valor de y0:'), Input(key='y0')],
-            [Text('Valor de z0:'), Input(key='z0')],
+            [Text(f'Valor de {vars[0]}0:'), Input(key='x0')],
+            [Text(f'Valor de {vars[1]}0:'), Input(key='y0')],
+            [Text(f'Valor de {vars[2]}0:'), Input(key='z0')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -335,9 +374,9 @@ def calc_inc_3(f : str):
 
     def inpt_delta_values():
         layout = [
-            [Text('Valor de Δx:'), Input(key='dx')],
-            [Text('Valor de Δy:'), Input(key='dy')],
-            [Text('Valor de Δz:'), Input(key='dz')],
+            [Text(f'Valor de Δ{vars[0]}:'), Input(key='dx')],
+            [Text(f'Valor de Δ{vars[1]}:'), Input(key='dy')],
+            [Text(f'Valor de Δ{vars[2]}:'), Input(key='dz')],
             [Button('OK'), Button('Cancelar')]
         ]
 
@@ -369,21 +408,23 @@ def calc_inc_3(f : str):
         popup_error('Error', 'Valor Inválido', auto_close=True, auto_close_duration=3)
         return
 
-    delta_x, delta_y, delta_z = (simplify(vars_values[1]["dx"]) + simplify(vars_values[0]["x0"]), simplify(
-        vars_values[1]["dy"]) + simplify(vars_values[0]["y0"]),
-        simplify(vars_values[1]["dz"]) + simplify(vars_values[0]["z0"]))
+    delta_x, delta_y, delta_z = (simplify(vars_values[1]["dx"]) + simplify(vars_values[0]["x0"]),
+                                 simplify(vars_values[1]["dy"]) + simplify(vars_values[0]["y0"]),
+                                 simplify(vars_values[1]["dz"]) + simplify(vars_values[0]["z0"]))
 
     init_f = function.subs({x: vars_values[0]["x0"], y: vars_values[0]["y0"], z: vars_values[0]['z0']})
     final_f = function.subs({x: delta_x, y: delta_y, z: delta_z})
 
-    delta_f = final_f - init_f
+    delta_f = round((final_f - init_f), 2)
+
     equacao_latex = (
-        f'Incremento de f(x,y,z) = ${f}$'
-        f'\n $x_0$ = ${vars_values[0]["x0"]:.2f}$\t$y_0$ = ${vars_values[0]["y0"]:.2f}$\t$z_0$ = ${vars_values[0]["z0"]:.2f}$'
-        f'\n $Δx$ = ${vars_values[1]["dx"]:.2f}$\t$Δy$ = ${vars_values[1]["dy"]:.2f}$\t$Δz$ = ${vars_values[1]["dz"]:.2f}$'
-        f'\n\n Δf = ${delta_f:.2f}$'
+        'Incremento de f('+vars[0]+','+vars[1]+','+vars[2]+') = $'+f+'$'
+        '\n $'+vars[0]+'_0$ = $'+str(vars_values[0]["x0"])+'$\t$'+vars[1]+'_0$ = $'+str(vars_values[0]["y0"])+'$\t$'+vars[2]+'_0$ = $'+str(vars_values[0]["z0"])+'$'
+        '\n $Δ'+vars[0]+'$ = $'+str(vars_values[1]["dx"])+'$\t$Δ'+vars[1]+'$ = $'+str(vars_values[1]["dy"])+'$\t$Δ'+vars[2]+'$ = $'+str(vars_values[1]["dz"])+'$'
+        '\n\n Δf = $'+str(delta_f)+'$'
     )
     plot_eq(equacao_latex, 'Incremento de Função com 3 Variaveis')
+
 
 def plot_eq(equacao_latex, title):
     """
@@ -397,18 +438,35 @@ def plot_eq(equacao_latex, title):
     ax.axis('off')  # Desliga os eixos para focar na equação
 
     # Desenha no PySimpleGUI
-    layout = [[Canvas(key='canvas')]]
+    layout = [[Canvas(key='canvas', expand_x=True, expand_y=True)]]
 
-    window = Window(title, layout, finalize=True, auto_size_text=True)
+    window = Window(title, layout, finalize=True, auto_size_text=True, resizable=True)
 
     # Conecta o Canvas do Matplotlib ao PySimpleGUI
     canvas_elem = window['canvas']
     canvas = FigureCanvasTkAgg(figura, canvas_elem.TKCanvas)
     canvas.draw()
-    canvas.get_tk_widget().pack()
+    canvas.get_tk_widget().pack(fill='both', expand=True)
+
+    last_size = (window.size[0], window.size[1])
+    last_resize_time = time()
+
+    # Redimensiona o Canvas do Matplotlib junto com a janela
+    def resize_canvas(event):
+        nonlocal last_size, last_resize_time
+        current_time = time()
+        if (event.width, event.height) != last_size and (current_time - last_resize_time) > 0.1:
+            last_size = (event.width, event.height)
+            last_resize_time = current_time
+            canvas.get_tk_widget().config(width=event.width, height=event.height)
+            figura.set_size_inches(event.width / figura.dpi, event.height / figura.dpi)
+            canvas.draw()
+
+    canvas_elem.TKCanvas.bind("<Configure>", resize_canvas)
 
     while True:
         event, _ = window.read()
+
         if event == WINDOW_CLOSED:
             break
 

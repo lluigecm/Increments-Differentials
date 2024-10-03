@@ -30,3 +30,7 @@ Execute o arquivo main:
 python ./main.py
 ```
 
+<h2>Ou simplesmente:</h2>
+```console
+baixe e execute o main.exe
+```

@@ -30,7 +30,7 @@ Execute o arquivo main:
 python ./main.py
 ```
 
-<h2>Ou</h2>
+<h2>Ou:</h2>
 
 Simplesmente:
 ```console

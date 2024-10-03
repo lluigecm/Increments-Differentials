@@ -13,13 +13,17 @@ def verify_error(f : str):
         popup_error('Função Inválida', 'Insira um valor válido para a função!', auto_close=True, auto_close_duration=5)
         return False
 
-    if len(set(findall(r'[a-z]', f))) < 2 or len(set(findall(r'[a-z]', f))) > 3:
-        popup_error('Função Inválida', 'Insira uma função com 2 a 3 variáveis!', auto_close=True, auto_close_duration=5)
-        return False
-
     if (len(findall('[(]', f)) != len(findall('[)]', f))):
         popup_error('Função Inválida', 'Insira uma função válida!', auto_close=True, auto_close_duration=5)
         return False
+
+    func = sub(r'(sin|cos|tan)', '', f)
+    func = sorted(list(set(findall(r'[a-z]', func))))
+
+    if len(func) > 3 or len(func) < 2:
+        popup_error('Função Inválida', 'Insira uma função com 2 ou 3 variáveis!', auto_close=True, auto_close_duration=5)
+        return False
+
     return True
 
 def calc_diff(f : str = None):
@@ -29,7 +33,8 @@ def calc_diff(f : str = None):
     if not verify_error(f):
         return
 
-    vars = findall(r'[a-z]', f)
+    vars = sub(r'(sin|cos|tan)', '', f)
+    vars = findall(r'[a-z]', vars)
     vars = sorted(list(set(vars)))
 
     if len(vars) == 2:
@@ -248,7 +253,8 @@ def calc_inc(f : str = None):
     if not verify_error(f):
         return
 
-    vars = findall(r'[a-z]', f)
+    vars = sub(r'(sin|cos|tan)', '', f)
+    vars = findall(r'[a-z]', vars)
     vars = sorted(list(set(vars)))
 
     if len(vars) == 2:

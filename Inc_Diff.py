@@ -10,18 +10,18 @@ def verify_error(f : str):
     Verifica se a função inserida é válida
     """
     if f is None or len(f) == 0:
-        popup_error('Função Inválida', 'Insira um valor válido para a função!', auto_close=True, auto_close_duration=5)
+        popup_error('Expressão Inválida', 'Insira um valor válido para a expressão!', auto_close=True, auto_close_duration=5)
         return False
 
     if (len(findall('[(]', f)) != len(findall('[)]', f))):
-        popup_error('Função Inválida', 'Insira uma função válida!', auto_close=True, auto_close_duration=5)
+        popup_error('Expressão Inválida', 'Insira uma expressão válida!', auto_close=True, auto_close_duration=5)
         return False
 
     func = sub(r'(sin|cos|tan)', '', f)
     func = sorted(list(set(findall(r'[a-z]', func))))
 
     if len(func) > 3 or len(func) < 2:
-        popup_error('Função Inválida', 'Insira uma função com 2 ou 3 variáveis!', auto_close=True, auto_close_duration=5)
+        popup_error('Expressão Inválida', 'Insira uma expressão com 2 ou 3 variáveis!', auto_close=True, auto_close_duration=5)
         return False
 
     return True

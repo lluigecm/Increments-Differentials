@@ -7,7 +7,16 @@ from time import time
 
 def verify_error(f : str):
     """
-    Verifica se a função inserida é válida
+    Verifica se a expressão fornecida é válida.
+    Args:
+        f (str): A expressão a ser verificada.
+    Returns:
+        bool: Retorna True se a expressão for válida, caso contrário, retorna False.
+    A função realiza as seguintes verificações:
+    1. Verifica se a expressão é nula ou vazia.
+    2. Verifica se o número de parênteses de abertura é igual ao número de parênteses de fechamento.
+    3. Verifica se a expressão contém entre 2 e 3 variáveis distintas (excluindo sin, cos e tan).
+    Em caso de erro, uma mensagem de erro é exibida através da função `popup_error`.
     """
     if f is None or len(f) == 0:
         popup_error('Expressão Inválida', 'Insira um valor válido para a expressão!', auto_close=True, auto_close_duration=5)
@@ -28,7 +37,15 @@ def verify_error(f : str):
 
 def calc_diff(f : str = None):
     """
-    Determina se a função tem 2 ou 3 variáveis e chama a função correspondente
+    Calcula a diferença de uma função dada.
+    Args:
+        f (str, opcional): A função em formato de string. Pode conter variáveis e funções trigonométricas como 'sin', 'cos' e 'tan'.
+    Retorna:
+        None: A função não retorna nenhum valor diretamente. Ela chama outras funções para calcular a diferença dependendo do número de variáveis encontradas na string fornecida.
+    Notas:
+        - Se a função fornecida não passar na verificação de erro, a execução será interrompida.
+        - A função identifica as variáveis presentes na string fornecida, removendo quaisquer funções trigonométricas.
+        - Dependendo do número de variáveis identificadas (2 ou 3), a função chama `calc_diff_2` ou `calc_diff_3` respectivamente para realizar o cálculo da diferença.
     """
     if not verify_error(f):
         return
@@ -45,7 +62,18 @@ def calc_diff(f : str = None):
 
 def calc_diff_2(f : str, vars : list):
     """
-    Calcula a diferencial de uma função com 2 variáveis
+    Calcula a diferencial de uma função de duas variáveis e, opcionalmente, avalia a diferencial em pontos específicos.
+    Parâmetros:
+    f (str): A função em formato de string, onde '^' representa a potência.
+    vars (list): Lista contendo duas variáveis da função.
+    Retorna:
+    None
+    O fluxo da função é o seguinte:
+    1. Simplifica a função fornecida.
+    2. Calcula as derivadas parciais da função em relação às variáveis fornecidas.
+    3. Monta a expressão da diferencial total.
+    4. Solicita ao usuário os valores iniciais das variáveis e os incrementos diferenciais.
+    5. Se solicitado, avalia a diferencial nos pontos fornecidos e exibe o resultado em formato LaTeX.
     """
     function = simplify(sub(r'\^', '**', f))
 
@@ -144,7 +172,23 @@ def calc_diff_2(f : str, vars : list):
 
 def calc_diff_3(f : str, vars : list):
     """
-    Calcula a diferencial de uma função com 3 variáveis
+    Calcula a diferencial de uma função de três variáveis e, opcionalmente, avalia a diferencial em pontos específicos.
+    Args:
+        f (str): A função em formato de string, onde os expoentes são representados por '^'.
+        vars (list): Lista contendo os nomes das variáveis da função.
+    Returns:
+        None: A função não retorna um valor, mas exibe uma janela gráfica com a diferencial da função e, se solicitado, 
+        o valor funcional da diferencial em pontos específicos.
+    A função realiza os seguintes passos:
+    1. Substitui os expoentes na string da função para o formato Python.
+    2. Calcula as derivadas parciais da função em relação a cada variável.
+    3. Monta a expressão da diferencial total.
+    4. Solicita ao usuário os valores iniciais das variáveis e os incrementos diferenciais através de janelas gráficas.
+    5. Se solicitado, calcula o valor funcional da diferencial nos pontos fornecidos.
+    6. Exibe a expressão da diferencial e, se aplicável, o valor funcional da diferencial em uma janela gráfica.
+    Nota:
+        - A função utiliza a biblioteca SymPy para manipulação simbólica e PySimpleGUI para as interfaces gráficas.
+        - A função assume que a lista 'vars' contém exatamente três variáveis.
     """
     function = sub(r'\^', '**', f)
 
@@ -248,7 +292,18 @@ def calc_diff_3(f : str, vars : list):
 
 def calc_inc(f : str = None):
     """
-    Determina se a função tem 2 ou 3 variáveis e chama a função correspondente
+    Calcula a incrementação diferencial de uma função.
+    Args:
+        f (str): A função em formato de string. A função deve conter variáveis
+                    representadas por letras e pode incluir funções trigonométricas
+                    como 'sin', 'cos' e 'tan'.
+    Returns:
+        None: A função não retorna nenhum valor. Se houver um erro na verificação
+                da função, a execução é interrompida.
+    A função identifica as variáveis presentes na string da função fornecida,
+    remove as funções trigonométricas e ordena as variáveis em ordem alfabética.
+    Dependendo do número de variáveis identificadas (2 ou 3), a função chama
+    `calc_inc_2` ou `calc_inc_3` para realizar o cálculo da incrementação diferencial.
     """
     if not verify_error(f):
         return
@@ -265,7 +320,23 @@ def calc_inc(f : str = None):
 
 def calc_inc_2(f : str, vars : list):
     """
-    Calcula o incremento de uma função com 2 variáveis
+    Calcula o incremento de uma função de duas variáveis.
+    Parâmetros:
+    f (str): A função em formato de string.
+    vars (list): Lista contendo os nomes das variáveis.
+    Retorna:
+    None. Exibe uma janela com o resultado do incremento da função.
+    O cálculo envolve:
+    1. Simplificação da função fornecida.
+    2. Solicitação dos valores iniciais das variáveis através de uma interface gráfica.
+    3. Solicitação dos valores de incremento das variáveis através de uma interface gráfica.
+    4. Cálculo do valor inicial da função com os valores fornecidos.
+    5. Cálculo do valor final da função após aplicar os incrementos.
+    6. Cálculo do incremento da função e exibição do resultado em formato LaTeX.
+    Observações:
+    - Se os valores fornecidos forem inválidos, uma mensagem de erro será exibida.
+    - A função utiliza a biblioteca SymPy para simplificação e substituição de variáveis.
+    - A interface gráfica é construída utilizando a biblioteca PySimpleGUI.
     """
     function = simplify(sub(r'\^', '**', f))
 
@@ -347,7 +418,24 @@ def calc_inc_2(f : str, vars : list):
 
 def calc_inc_3(f : str, vars : list):
     """
-    Calcula o incremento de uma função com 3 variáveis
+    Calcula o incremento de uma função de três variáveis.
+    Parâmetros:
+    f (str): A função em formato de string, onde os expoentes são representados por '^'.
+    vars (list): Lista contendo os nomes das variáveis da função.
+    Retorna:
+    None. Exibe uma janela com o resultado do incremento da função.
+    O cálculo envolve:
+    1. Simplificação da função fornecida.
+    2. Solicitação dos valores iniciais das variáveis através de uma interface gráfica.
+    3. Solicitação dos valores dos incrementos das variáveis através de uma interface gráfica.
+    4. Cálculo do valor inicial da função com os valores fornecidos.
+    5. Cálculo do valor final da função com os valores incrementados.
+    6. Cálculo do incremento da função.
+    7. Exibição do resultado em formato LaTeX.
+    Observações:
+    - Se os valores fornecidos forem inválidos, uma mensagem de erro será exibida.
+    - A função utiliza a biblioteca SymPy para simplificação e substituição de variáveis.
+    - A interface gráfica é construída utilizando a biblioteca PySimpleGUI.
     """
     function = simplify(sub(r'\^', '**', f))
 
@@ -434,7 +522,17 @@ def calc_inc_3(f : str, vars : list):
 
 def plot_eq(equacao_latex, title):
     """
-    Renderiza a equação LaTeX e a exibe em um popup usando Matplotlib e PySimpleGUI
+    Plota uma equação LaTeX em uma janela PySimpleGUI redimensionável.
+    Args:
+        equacao_latex (str): A equação em formato LaTeX a ser exibida.
+        title (str): O título da janela PySimpleGUI.
+    Detalhes:
+        - A função cria uma figura Matplotlib e insere a equação LaTeX no centro.
+        - A janela PySimpleGUI é criada com um Canvas que exibe a figura Matplotlib.
+        - O Canvas é redimensionado automaticamente quando a janela é redimensionada.
+        - A função mantém a janela aberta até que o evento de fechamento seja acionado.
+    Exemplo:
+        plot_eq(r"E=mc^2", "Equação de Einstein")
     """
     font_size = max(15 - len(equacao_latex) // 20, 14)
 

@@ -6,3 +6,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# TO DO
+# - Aumentar casas decimais
+# - Colocar par ordenado no diferencial

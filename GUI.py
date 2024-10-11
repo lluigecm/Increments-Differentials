@@ -24,7 +24,7 @@ class GUI:
     """
     def __init__(self):
         # Tudo que estiver dentro da janela
-        self.layout = [[Text("Insira a expressão da função:", size=30)],
+        self.layout = [[Text("Insira a expressão da função de duas ou três variáveis:", size=40)],
                     [InputText()],
                     [Button('Calcular Incremento', size=(18,10)),
                      Button('Calcular Diferencial', size=(18,10))]]

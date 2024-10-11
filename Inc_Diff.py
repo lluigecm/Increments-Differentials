@@ -50,9 +50,7 @@ def calc_diff(f : str = None):
     if not verify_error(f):
         return
 
-    vars = sub(r'(sin|cos|tan)', '', f)
-    vars = findall(r'[a-z]', vars)
-    vars = sorted(list(set(vars)))
+    vars = get_vars(f)
 
     if len(vars) == 2:
         calc_diff_2(f, vars)
@@ -134,12 +132,22 @@ def calc_diff_2(f : str, vars : list):
         window.close()
         return values
 
+    count_abc = sum(var in ['a', 'b', 'c'] for var in vars)
+
+    if count_abc != 0:
+        if count_abc == 1:
+            df_latex = latex(df).replace(vars[0] + "d", "d" + vars[0]).replace("d" + vars[1], vars[1] + "d")
+        elif count_abc == 2:
+            df_latex = latex(df).replace(vars[0] + "d", "d" + vars[0]).replace(vars[1] + "d", "d" + vars[1])
+    else:
+        df_latex = latex(df).replace("d" + vars[0], vars[0] + "d").replace("d" + vars[1], vars[1] + "d")
+
     resp = popup_yes_no("Calcular valor funcional da diferencial?")
 
     if resp == "No":
         equacao_latex =(
-            f'Diferencial da função $f(x,y)$ = ${f}$'
-            f'\n\n$D_f$ = ${latex(df)}$'
+            f'Diferencial da função $f({vars[0]},{vars[1]})$ = ${f}$'
+            f'\n\n$D_f({vars[0]},{vars[1]})$ = ${df_latex}$'
         )
 
         plot_eq(equacao_latex, 'Diferencial')
@@ -161,11 +169,11 @@ def calc_diff_2(f : str, vars : list):
     df_total = simplify(df.subs({x: x0, y: y0, dx: diffx, dy: diffy}))
 
     equacao_latex = (
-        f'Diferencial da função $f(x,y)$ = ${f}$'
+        f'Diferencial da função $f({vars[0]},{vars[1]})$ = ${f}$'
         f'\n\n${vars[0]}_0$ = ${x0:.4f}$\t${vars[1]}_0$ = ${y0:.4f}$'
         f'\n$d{vars[0]}$ = ${diffx:.4f}$\t$d{vars[1]}$ = ${diffy:.4f}$\n\n'
-        f'\n$D_f$ = ${latex(df)}$'
-        f'\n\n$D_f$ = ${df_total:.4f}$'
+        f'\n\n$D_f({vars[0]},{vars[1]})$ = ${df_latex}$'
+        f'\n\n$D_f({vars[0]},{vars[1]})$ = ${df_total:.4f}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com duas variáveis')
@@ -253,12 +261,27 @@ def calc_diff_3(f : str, vars : list):
         window.close()
         return values
 
+    count_abc = sum(var in ['a', 'b', 'c'] for var in vars)
+
+    if count_abc != 0:
+        if count_abc == 1:
+            df_latex = latex(df).replace(vars[0] + "d", "d" + vars[0]).replace("d" + vars[1], vars[1] + "d").replace(
+                "d" + vars[2], vars[2] + "d")
+        elif count_abc == 2:
+            df_latex = latex(df).replace(vars[0] + "d", "d" + vars[0]).replace(vars[1] + "d", "d" + vars[1]).replace(
+                "d" + vars[2], vars[2] + "d")
+        else:
+            df_latex = latex(df).replace(vars[0] + "d", "d" + vars[0]).replace(vars[1] + "d", "d" + vars[1]).replace(
+                vars[2] + "d", "d" + vars[2])
+    else:
+        df_latex = latex(df).replace("d" + vars[0], vars[0] + "d").replace("d" + vars[1], vars[1] + "d").replace(
+            "d" + vars[2], vars[2] + "d")
     resp = popup_yes_no("Calcular valor funcional da diferencial?")
 
     if resp == "No":
         equacao_latex = (
             f'Diferencial da função f({vars[0]},{vars[1]},{vars[2]}) = ${f}$'
-            f'\n\n$D_f$ = ${latex(df)}$\n'
+            f'\n\n$D_f({vars[0]},{vars[1]},{vars[2]})$ = ${df_latex}$\n'
         )
 
         plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
@@ -284,8 +307,8 @@ def calc_diff_3(f : str, vars : list):
         f'Diferencial da função f({vars[0]},{vars[1]},{vars[2]}) = ${f}$'
         f'\n\n${vars[0]}_0$ = {x0}\t${vars[1]}_0$ = {y0}\t${vars[2]}_0$ = {z0}'
         f'\n$d{vars[0]}$ = ${diffx:.4f}$\t$d{vars[1]}$ = ${diffy:.4f}$\t$d{vars[2]}$ = ${diffz:.4f}$\n\n'
-        f'\n$D_f$ = ${latex(df)}$'
-        f'\n\n$D_f$ = ${df_total:.4f}$'
+        f'\n\n$D_f({vars[0]},{vars[1]},{vars[2]})$ = ${df_latex}$\n'
+        f'\n\n$D_f({vars[0]},{vars[1]},{vars[2]})$ = ${df_total:.4f}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
@@ -308,9 +331,7 @@ def calc_inc(f : str = None):
     if not verify_error(f):
         return
 
-    vars = sub(r'(sin|cos|tan)', '', f)
-    vars = findall(r'[a-z]', vars)
-    vars = sorted(list(set(vars)))
+    vars = get_vars(f)
 
     if len(vars) == 2:
         calc_inc_2(f, vars)
@@ -575,3 +596,19 @@ def plot_eq(equacao_latex, title):
             break
 
     window.close()
+
+def get_vars(f : str):
+    """
+    Retorna uma lista de variáveis presentes na função fornecida.
+    Args:
+        f (str): A função em formato de string.
+    Returns:
+        list: Uma lista de variáveis presentes na função.
+    A função remove funções trigonométricas da string fornecida e retorna uma lista
+    de variáveis únicas presentes na função.
+    Exemplo:
+        get_vars("f(x, y) = x^2 + y^2 + sin(x) + cos(y)") -> ['x', 'y']
+    """
+    vars = sub(r'(sin|cos|tan)', '', f)
+    vars = findall(r'[a-z]', vars)
+    return sorted(list(set(vars)))

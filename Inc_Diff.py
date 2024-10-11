@@ -162,10 +162,10 @@ def calc_diff_2(f : str, vars : list):
 
     equacao_latex = (
         f'Diferencial da função $f(x,y)$ = ${f}$'
-        f'\n\n${vars[0]}_0$ = ${x0:.2f}$\t${vars[1]}_0$ = ${y0:.2f}$'
-        f'\n$d{vars[0]}$ = ${diffx:.2f}$\t$d{vars[1]}$ = ${diffy:.2f}$\n\n'
+        f'\n\n${vars[0]}_0$ = ${x0:.4f}$\t${vars[1]}_0$ = ${y0:.4f}$'
+        f'\n$d{vars[0]}$ = ${diffx:.4f}$\t$d{vars[1]}$ = ${diffy:.4f}$\n\n'
         f'\n$D_f$ = ${latex(df)}$'
-        f'\n\n$D_f$ = ${df_total:.2f}$'
+        f'\n\n$D_f$ = ${df_total:.4f}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com duas variáveis')
@@ -283,9 +283,9 @@ def calc_diff_3(f : str, vars : list):
     equacao_latex = (
         f'Diferencial da função f({vars[0]},{vars[1]},{vars[2]}) = ${f}$'
         f'\n\n${vars[0]}_0$ = {x0}\t${vars[1]}_0$ = {y0}\t${vars[2]}_0$ = {z0}'
-        f'\n$d{vars[0]}$ = ${diffx:.2f}$\t$d{vars[1]}$ = ${diffy:.2f}$\t$d{vars[2]}$ = ${diffz:.2f}$\n\n'
+        f'\n$d{vars[0]}$ = ${diffx:.4f}$\t$d{vars[1]}$ = ${diffy:.4f}$\t$d{vars[2]}$ = ${diffz:.4f}$\n\n'
         f'\n$D_f$ = ${latex(df)}$'
-        f'\n\n$D_f$ = ${df_total:.2f}$'
+        f'\n\n$D_f$ = ${df_total:.4f}$'
     )
 
     plot_eq(equacao_latex, 'Diferencial de Função com três variáveis')
